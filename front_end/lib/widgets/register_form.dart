@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:front_end/screens/login.dart';
 import 'package:front_end/widgets/image_animation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -11,6 +13,10 @@ class RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   final List<String> _images = [
@@ -32,9 +38,66 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   void _onLoginPressed() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (ctx) => const LoginScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (ctx) => const LoginScreen()));
+  }
+
+  void _registerUser(
+    String firstName,
+    String lastName,
+    String email,
+    String password,
+  ) async {
+    try {
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      final user = userCredential.user;
+
+      if (user != null) {
+        
+
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'firstName': firstName,
+          'lastName': lastName,
+          'email': email,
+          'createdAt': Timestamp.now(),
+        });
+        await user.sendEmailVerification();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Registration successful! Check your email to verify.',
+            ),
+          ),
+        ); 
+        
+        
+
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (ctx) => const LoginScreen()));
+      }
+    } on FirebaseAuthException catch (e) {
+      String message;
+
+      if (e.code == 'email-already-in-use') {
+        message = 'This email is already registered.';
+      } else if (e.code == 'weak-password') {
+        message = 'Password must be at least 6 characters.';
+      } else {
+        message = 'Registration failed. Try again.';
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unexpected error. Please try again.')),
+      );
+    }
   }
 
   @override
@@ -55,6 +118,7 @@ class _RegisterFormState extends State<RegisterForm> {
             child: Column(
               children: [
                 TextFormField(
+                  controller: _firstNameController,
                   decoration: InputDecoration(
                     labelText: 'First Name',
                     prefixIcon: const Icon(Icons.person_outline),
@@ -72,6 +136,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 const SizedBox(height: 10),
 
                 TextFormField(
+                  controller: _lastNameController,
                   decoration: InputDecoration(
                     labelText: 'Last Name',
                     prefixIcon: const Icon(Icons.person_outline),
@@ -89,6 +154,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 const SizedBox(height: 10),
 
                 TextFormField(
+                  controller: _emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
                     prefixIcon: const Icon(Icons.email_outlined),
@@ -110,6 +176,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 const SizedBox(height: 10),
 
                 TextFormField(
+                  controller: _passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     labelText: 'Password',
@@ -117,8 +184,9 @@ class _RegisterFormState extends State<RegisterForm> {
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
+                            ? Icons
+                                  .visibility_off_outlined // good logic here ✅
+                            : Icons.visibility_outlined,
                       ),
                       onPressed: () {
                         setState(() {
@@ -145,10 +213,11 @@ class _RegisterFormState extends State<RegisterForm> {
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Registration in progress...'),
-                        ),
+                      _registerUser(
+                        _firstNameController.text.trim(),
+                        _lastNameController.text.trim(),
+                        _emailController.text.trim(),
+                        _passwordController.text.trim(),
                       );
                     }
                   },
@@ -178,49 +247,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () {},
-                      borderRadius: BorderRadius.circular(30),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey.shade300,
-                            width: 1,
-                          ),
-                        ),
-                        child: Image.asset('assets/images/google_logo.png'),
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    InkWell(
-                      onTap: () {},
-                      borderRadius: BorderRadius.circular(30),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey.shade300,
-                            width: 1,
-                          ),
-                        ),
-                        child: Image.asset('assets/images/apple_logo.png'),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -229,4 +256,3 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 }
-

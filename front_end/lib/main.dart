@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:front_end/screens/home.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 final colorScheme = ColorScheme.fromSeed(
   brightness: Brightness.light,
@@ -21,6 +23,9 @@ final theme = ThemeData().copyWith(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   
   await SystemChrome.setPreferredOrientations([
