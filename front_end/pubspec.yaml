@@ -1,0 +1,34 @@
+name: front_end
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  carousel_slider: ^5.1.1
+  flutter:
+    sdk: flutter
+  google_fonts: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/lexis.png
+    - assets/images/google_logo.png
+    - assets/images/apple_logo.png
+    - assets/images/breakfast_1.png
+    - assets/images/breakfast_2.png
+    - assets/images/meal_1.png
+    - assets/images/meal_2.png
+    - assets/images/meal_3.png
+    - assets/images/snack1.png
+    - assets/images/snack2.png
+    - assets/images/logo.png
