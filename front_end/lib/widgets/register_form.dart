@@ -68,7 +68,7 @@ class _RegisterFormState extends State<RegisterForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Registration successful! Check your email to verify.',
+              'Registration successful!',
             ),
           ),
         ); 
