@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:front_end/screens/dashboard.dart';
 import 'package:front_end/screens/register.dart';
 import 'package:front_end/widgets/image_animation.dart';
 
@@ -41,16 +43,51 @@ class _LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      final email = _emailController.text.trim();
-      final password = _passwordController.text.trim();
-      debugPrint('Login attempt: $email / $password');
+  void _submitForm(String email, String password) async {
+    try {
+      final userCredential =  await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final user = userCredential.user;
 
+      if(user != null){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Login successful!',
+            ),
+          ),
+        );
+      }
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (ctx) => const DashboardScreen()),
+      );
+      
+    } on FirebaseException catch (e) {
+      String message = '';
+      
+      if (e.code == 'user-not-found') {
+        message = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Wrong password provided for that user.';
+      } else {
+        message = 'An error occurred. Please try again.';
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Logging in...')),
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An unexpected error occurred. Please try again.'),
+        ),
       );
     }
+
+   
   }
 
   void _onRegisterPressed() {
@@ -146,7 +183,14 @@ class _LoginFormState extends State<LoginForm> {
                 const SizedBox(height: 20),
 
                 ElevatedButton(
-                  onPressed: _submitForm,
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      _submitForm(
+                        _emailController.text.trim(),
+                        _passwordController.text.trim(),
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[600],
                     padding: const EdgeInsets.symmetric(
