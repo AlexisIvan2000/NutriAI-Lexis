@@ -185,7 +185,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       icon: Icon(
                         _obscurePassword
                             ? Icons
-                                  .visibility_off_outlined // good logic here ✅
+                                  .visibility_off_outlined 
                             : Icons.visibility_outlined,
                       ),
                       onPressed: () {

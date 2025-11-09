@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class User {
-  const User ({
+class AppUser {
+  const AppUser ({
     required this.uid,
     required this.firstName,
     required this.lastName,
@@ -14,8 +14,8 @@ class User {
   final String email;
   final DateTime createdAt;
 
-  factory User.fromMap(String uid, Map<String, dynamic> data) {
-    return User(
+  factory AppUser.fromMap(String uid, Map<String, dynamic> data) {
+    return AppUser(
       uid: uid,
       firstName: data['firstName'] ?? '',
       lastName: data['lastName'] ?? '',
