@@ -18,7 +18,7 @@ class MealsScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: const Navigation(),
+      bottomNavigationBar: const NavigationBr(),
     );
   }
   

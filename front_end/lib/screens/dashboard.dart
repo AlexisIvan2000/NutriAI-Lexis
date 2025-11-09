@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:front_end/models/user.dart';
+import 'package:front_end/screens/profile.dart';
 import 'package:front_end/widgets/image_animation.dart';
 import 'package:front_end/widgets/recipes_cat.dart';
 import 'package:front_end/widgets/navigation_bar.dart';
@@ -84,7 +85,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
               ),
               const Spacer(),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.person)),
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ProfileScreen(),
+                  ),
+                );
+                }, 
+                icon: const Icon(Icons.person)),
             ],
           ),
         ),
@@ -137,11 +146,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 20),
                 const RecipesCat(),
                 const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Text(
+                      'Recommended for you !',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontSize: 18,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
         ),
-        bottomNavigationBar: Navigation(),
+        bottomNavigationBar: NavigationBr(),
       ),
     );
   }

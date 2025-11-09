@@ -5,8 +5,8 @@ import 'package:front_end/screens/favorites.dart';
 import 'package:front_end/screens/meals.dart';
 
 
-class Navigation extends StatelessWidget {
-  const Navigation({super.key});
+class NavigationBr extends StatelessWidget {
+  const NavigationBr({super.key});
 
   @override
   Widget build(BuildContext context) {
