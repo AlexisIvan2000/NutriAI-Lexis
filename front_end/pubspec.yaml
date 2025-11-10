@@ -15,6 +15,7 @@ dependencies:
     sdk: flutter
   google_fonts: ^6.3.2
   google_sign_in: ^6.1.5
+  lottie: ^3.3.2
 
 dev_dependencies:
   flutter_test:
@@ -42,3 +43,4 @@ flutter:
     - assets/images/img4.png
     - assets/images/img5.png
     - assets/images/recommended.png
+    - assets/animations/loading.json

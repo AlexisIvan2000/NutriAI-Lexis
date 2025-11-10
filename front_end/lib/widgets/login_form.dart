@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:front_end/screens/dashboard.dart';
 import 'package:front_end/screens/register.dart';
 import 'package:front_end/widgets/image_animation.dart';
+import 'package:front_end/widgets/loading_animation.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -86,11 +87,22 @@ class _LoginFormState extends State<LoginForm> {
       context,
     ).push(MaterialPageRoute(builder: (ctx) => const Register()));
   }
+  Future<void> resetPassword() async {
+    
+  }
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return;
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      await googleSignIn.signOut();
+
+      LoadingDialog.show(context);
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        LoadingDialog.hide(context);
+        return;
+      }
 
       final googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
@@ -133,11 +145,14 @@ class _LoginFormState extends State<LoginForm> {
         }
       }
 
+      LoadingDialog.hide(context);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const DashboardScreen()),
       );
     } catch (e) {
+      LoadingDialog.hide(context);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Google sign-in failed: $e")));
@@ -259,11 +274,11 @@ class _LoginFormState extends State<LoginForm> {
                   onPressed: () => signInWithGoogle(context),
                   icon: Image.asset(
                     'assets/images/google_logo.png',
-                    height: 24,
-                    width: 24,
+                    height: 25,
+                    width: 25,
                   ),
                   label: const Text(
-                    'Sign in with Google',
+                    'Login with Google',
                     style: TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -288,7 +303,6 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                   ),
                 ),
-                
               ],
             ),
           ),
