@@ -92,9 +92,7 @@ class _LoginFormState extends State<LoginForm> {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) return;
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
+      final googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -106,39 +104,43 @@ class _LoginFormState extends State<LoginForm> {
       final user = userCredential.user;
 
       if (user != null) {
-        final doc = await FirebaseFirestore.instance
+        final docRef = FirebaseFirestore.instance
             .collection('users')
-            .doc(user.uid)
-            .get();
+            .doc(user.uid);
+        final doc = await docRef.get();
 
-        final fullName = user.displayName?.split(' ') ?? [];
-        final firstName = fullName.isNotEmpty ? fullName.first : '';
-        final lastName = fullName.length > 1 ? fullName.last : '';
+        final googleFirst = user.displayName?.split(' ').first ?? '';
+        final googleLast = user.displayName?.split(' ').length == 2
+            ? user.displayName!.split(' ').last
+            : '';
 
         if (!doc.exists) {
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(user.uid)
-              .set({
-                'firstName': firstName,
-                'lastName': lastName,
-                'email': user.email,
-                'createdAt': Timestamp.now(),
-              });
+          await docRef.set({
+            'firstName': googleFirst,
+            'lastName': googleLast,
+            'email': user.email,
+            'createdAt': Timestamp.now(),
+          });
+        } else {
+          await docRef.update({
+            'firstName': (doc['firstName'] as String).isEmpty
+                ? googleFirst
+                : doc['firstName'],
+            'lastName': (doc['lastName'] as String).isEmpty
+                ? googleLast
+                : doc['lastName'],
+          });
         }
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Google sign-in successful!')),
-      );
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (ctx) => const DashboardScreen()),
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const DashboardScreen()),
       );
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Google sign-in failed: $e')));
+      ).showSnackBar(SnackBar(content: Text("Google sign-in failed: $e")));
     }
   }
 
@@ -239,8 +241,8 @@ class _LoginFormState extends State<LoginForm> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[600],
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 60,
-                      vertical: 14,
+                      horizontal: 73,
+                      vertical: 12,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -251,9 +253,31 @@ class _LoginFormState extends State<LoginForm> {
                     style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
+                const SizedBox(height: 15),
                 const SizedBox(height: 10),
-
-                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  onPressed: () => signInWithGoogle(context),
+                  icon: Image.asset(
+                    'assets/images/google_logo.png',
+                    height: 24,
+                    width: 24,
+                  ),
+                  label: const Text(
+                    'Sign in with Google',
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Colors.grey),
+                    ),
+                  ),
+                ),
 
                 TextButton(
                   onPressed: _onRegisterPressed,
@@ -264,48 +288,7 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () => signInWithGoogle(context),
-                      borderRadius: BorderRadius.circular(30),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey.shade300,
-                            width: 1,
-                          ),
-                        ),
-                        child: Image.asset('assets/images/google_logo.png'),
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    InkWell(
-                      onTap: () {},
-                      borderRadius: BorderRadius.circular(30),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey.shade300,
-                            width: 1,
-                          ),
-                        ),
-                        child: Image.asset('assets/images/apple_logo.png'),
-                      ),
-                    ),
-                  ],
-                ),
+                
               ],
             ),
           ),
