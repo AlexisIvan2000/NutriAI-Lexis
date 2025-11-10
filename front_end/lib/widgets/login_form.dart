@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:front_end/screens/dashboard.dart';
 import 'package:front_end/screens/register.dart';
 import 'package:front_end/widgets/image_animation.dart';
@@ -22,10 +25,9 @@ class _LoginFormState extends State<LoginForm> {
     'assets/images/breakfast_2.png',
     'assets/images/meal_1.png',
     'assets/images/meal_2.png',
-    'assets/images/meal_3.png',    
+    'assets/images/meal_3.png',
     'assets/images/snack1.png',
     'assets/images/snack2.png',
-    
   ];
 
   @override
@@ -45,28 +47,21 @@ class _LoginFormState extends State<LoginForm> {
 
   void _submitForm(String email, String password) async {
     try {
-      final userCredential =  await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
       final user = userCredential.user;
 
-      if(user != null){
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Login successful!',
-            ),
-          ),
-        );
+      if (user != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Login successful!')));
       }
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (ctx) => const DashboardScreen()),
       );
-      
     } on FirebaseException catch (e) {
       String message = '';
-      
+
       if (e.code == 'user-not-found') {
         message = 'No user found for that email.';
       } else if (e.code == 'wrong-password') {
@@ -74,11 +69,9 @@ class _LoginFormState extends State<LoginForm> {
       } else {
         message = 'An error occurred. Please try again.';
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -86,14 +79,67 @@ class _LoginFormState extends State<LoginForm> {
         ),
       );
     }
-
-   
   }
 
   void _onRegisterPressed() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (ctx) => const Register()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (ctx) => const Register()));
+  }
+
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return;
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+      final user = userCredential.user;
+
+      if (user != null) {
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        final fullName = user.displayName?.split(' ') ?? [];
+        final firstName = fullName.isNotEmpty ? fullName.first : '';
+        final lastName = fullName.length > 1 ? fullName.last : '';
+
+        if (!doc.exists) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .set({
+                'firstName': firstName,
+                'lastName': lastName,
+                'email': user.email,
+                'createdAt': Timestamp.now(),
+              });
+        }
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Google sign-in successful!')),
+      );
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (ctx) => const DashboardScreen()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Google sign-in failed: $e')));
+    }
   }
 
   @override
@@ -176,7 +222,6 @@ class _LoginFormState extends State<LoginForm> {
                         color: Theme.of(context).colorScheme.primary,
                         fontSize: 15,
                       ),
-                      
                     ),
                   ),
                 ),
@@ -208,7 +253,6 @@ class _LoginFormState extends State<LoginForm> {
                 ),
                 const SizedBox(height: 10),
 
-                
                 const SizedBox(height: 10),
 
                 TextButton(
@@ -226,7 +270,7 @@ class _LoginFormState extends State<LoginForm> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     InkWell(
-                      onTap: () {},
+                      onTap: () => signInWithGoogle(context),
                       borderRadius: BorderRadius.circular(30),
                       child: Container(
                         width: 50,
@@ -258,7 +302,6 @@ class _LoginFormState extends State<LoginForm> {
                           ),
                         ),
                         child: Image.asset('assets/images/apple_logo.png'),
-                        
                       ),
                     ),
                   ],

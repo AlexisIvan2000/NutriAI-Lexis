@@ -56,24 +56,15 @@ class _RegisterFormState extends State<RegisterForm> {
       final user = userCredential.user;
 
       if (user != null) {
-        
-
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'firstName': firstName,
           'lastName': lastName,
           'email': email,
           'createdAt': Timestamp.now(),
         });
-        await user.sendEmailVerification();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Registration successful!',
-            ),
-          ),
-        ); 
-        
-        
+          const SnackBar(content: Text('Registration successful!')),
+        );
 
         Navigator.of(
           context,
@@ -184,8 +175,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
-                            ? Icons
-                                  .visibility_off_outlined 
+                            ? Icons.visibility_off_outlined
                             : Icons.visibility_outlined,
                       ),
                       onPressed: () {

@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:front_end/screens/home.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    void logout() {
+      FirebaseAuth.instance.signOut().then((_) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (Route<dynamic> route) => false,
+        );
+      });
+    }
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -21,9 +31,35 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
         child: Container(
-          
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  logout();
+                },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(
+                    const Color.fromARGB(7, 27, 28, 27),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.logout, color: Color.fromARGB(255, 0, 0, 0)),
+                    SizedBox(width: 8),
+                    Text(
+                      'Logout',
+                      style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+             
+            ],
+          ),
         ),
       ),
     );
