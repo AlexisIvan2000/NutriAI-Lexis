@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:front_end/screens/home.dart';
 import 'package:front_end/widgets/profile/avatar.dart';
+import 'package:front_end/widgets/profile/personal_details.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -41,6 +42,8 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 20),             
               const Avatar(),              
               const SizedBox(height: 20),
+              const PersonalDetails(),
+              const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () {
                   logout();

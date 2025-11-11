@@ -101,13 +101,15 @@ class _AvatarState extends State<Avatar> {
             const SizedBox(height: 20),
             Row(
               children: [
-                Text('Full Name', style: theme.textTheme.bodyMedium),
+                Text('Full Name', style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                )),
                 const Spacer(),
                 Text(
                   '${currentUser!.firstName} ${currentUser!.lastName}',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                  style: theme.textTheme.bodyMedium?.copyWith(                    
                     color: Colors.black87,
+                    fontSize: 16,
                   ),
                 ),
               ],
@@ -115,13 +117,15 @@ class _AvatarState extends State<Avatar> {
             const SizedBox(height: 5),
             Row(
               children: [
-                Text('Email', style: theme.textTheme.bodyMedium),
+                Text('Email', style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                )),
                 const Spacer(),
                 Text(
                   currentUser!.email,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.black87,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 16,                   
                   ),
                 ),
               ],
