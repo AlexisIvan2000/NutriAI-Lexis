@@ -87,11 +87,10 @@ class _LoginFormState extends State<LoginForm> {
       context,
     ).push(MaterialPageRoute(builder: (ctx) => const Register()));
   }
-  Future<void> resetPassword() async {
-    
-  }
 
-  Future<void> signInWithGoogle(BuildContext context) async {
+  
+
+  Future<void> _signInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
       await googleSignIn.signOut();
@@ -271,7 +270,7 @@ class _LoginFormState extends State<LoginForm> {
                 const SizedBox(height: 15),
                 const SizedBox(height: 10),
                 ElevatedButton.icon(
-                  onPressed: () => signInWithGoogle(context),
+                  onPressed: () => _signInWithGoogle(context),
                   icon: Image.asset(
                     'assets/images/google_logo.png',
                     height: 25,

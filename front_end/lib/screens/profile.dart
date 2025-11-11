@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:front_end/screens/home.dart';
+import 'package:front_end/widgets/profile/avatar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -15,6 +16,7 @@ class ProfileScreen extends StatelessWidget {
         );
       });
     }
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -34,7 +36,11 @@ class ProfileScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 20),             
+              const Avatar(),              
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   logout();
@@ -51,13 +57,15 @@ class ProfileScreen extends StatelessWidget {
                     SizedBox(width: 8),
                     Text(
                       'Logout',
-                      style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 16),
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 0, 0, 0),
+                        fontSize: 16,
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
-             
             ],
           ),
         ),
