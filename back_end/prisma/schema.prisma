@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  firstName     String?
+  lastName      String?
+  createdAt     DateTime @default(now())
+
+  age           Int?
+  currentWeight Float?
+  targetWeight  Float?
+  height        Float?
+  gender        String?
+  activity      String?
+  dietType      String?
+  allergies     String?
+  goal          String?
+
+  // NOUVEAU: Champ de relation inverse, doit être optionnel (relation 1:1)
+  nutritionStats  NutritionStats?
+}
+
+model NutritionStats {
+  id        Int      @id @default(autoincrement())
+  calories  Int
+  carbs     Int
+  protein   Int
+  fat       Int
+  createdAt DateTime @default(now())
+
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+}
